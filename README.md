@@ -17,6 +17,8 @@ make replay
 
 Without Make, use `node clunkyard.cjs build`, `match` and `replay` (also available through `npm run`). The first build downloads the checksum-pinned local engine (6.7MiB) and only this language's SDK (0.71MiB). It installs into ignored `.clunkyard/`; it does not download a toolchain or require Docker, an account, root access or the all-language builder. An existing matching installation can be selected with `CLUNKYARD_SDK`. Compiler-specific bindings rebuild with your installed compiler.
 
+Install Elixir, Erlang with development headers (erlang-dev on Ubuntu), and a C compiler to rebuild the shared Erlang NIF.
+
 Read the [language binding guide](https://clunkyard.com/sdk/elixir) for compiler versions, the official language guide and dependencies. Run `node clunkyard.cjs doctor` to check available tools. Your normal language commands remain available; `make` provides a repeatable SDK-aware build. 
 
 ## Repeat a trial

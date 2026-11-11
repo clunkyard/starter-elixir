@@ -1,18 +1,18 @@
 {
-  "version": "v2.0.0-kit.1",
+  "version": "v2.0.0-kit.2",
   "sdkVersion": "2.0.0",
   "language": "elixir",
   "portable": false,
   "engine": {
-    "file": "clunkyard-engine-v2.0.0-kit.1.tar.gz",
-    "url": "https://github.com/clunkyard/game-kit/releases/download/v2.0.0-kit.1/clunkyard-engine-v2.0.0-kit.1.tar.gz",
+    "file": "clunkyard-engine-v2.0.0-kit.2.tar.gz",
+    "url": "https://github.com/clunkyard/game-kit/releases/download/v2.0.0-kit.2/clunkyard-engine-v2.0.0-kit.2.tar.gz",
     "bytes": 7071301,
     "sha256": "0b9cfa6958a952c32388602821ec4275e61400255f91b212f9c2a9220f8a0d86",
     "expandedBytes": 33794538
   },
   "sdk": {
-    "file": "clunkyard-sdk-elixir-linux-x64-v2.0.0-kit.1.tar.gz",
-    "url": "https://github.com/clunkyard/game-kit/releases/download/v2.0.0-kit.1/clunkyard-sdk-elixir-linux-x64-v2.0.0-kit.1.tar.gz",
+    "file": "clunkyard-sdk-elixir-linux-x64-v2.0.0-kit.2.tar.gz",
+    "url": "https://github.com/clunkyard/game-kit/releases/download/v2.0.0-kit.2/clunkyard-sdk-elixir-linux-x64-v2.0.0-kit.2.tar.gz",
     "bytes": 748639,
     "sha256": "bcd313e7cbef626dbfcab347bc1bbd652a68e4ada7ffbb3384ce822695628941",
     "expandedBytes": 3723550
@@ -27,5 +27,10 @@
     "elixir",
     "erlc",
     "cc"
-  ]
+  ],
+  "requirements": {
+    "notes": [
+      "Install Elixir, Erlang with development headers (erlang-dev on Ubuntu), and a C compiler to rebuild the shared Erlang NIF."
+    ]
+  }
 }
