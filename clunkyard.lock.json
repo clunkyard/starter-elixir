@@ -1,0 +1,31 @@
+{
+  "version": "v2.0.0-kit.1",
+  "sdkVersion": "2.0.0",
+  "language": "elixir",
+  "portable": false,
+  "engine": {
+    "file": "clunkyard-engine-v2.0.0-kit.1.tar.gz",
+    "url": "https://github.com/clunkyard/game-kit/releases/download/v2.0.0-kit.1/clunkyard-engine-v2.0.0-kit.1.tar.gz",
+    "bytes": 7071301,
+    "sha256": "0b9cfa6958a952c32388602821ec4275e61400255f91b212f9c2a9220f8a0d86",
+    "expandedBytes": 33794538
+  },
+  "sdk": {
+    "file": "clunkyard-sdk-elixir-linux-x64-v2.0.0-kit.1.tar.gz",
+    "url": "https://github.com/clunkyard/game-kit/releases/download/v2.0.0-kit.1/clunkyard-sdk-elixir-linux-x64-v2.0.0-kit.1.tar.gz",
+    "bytes": 748639,
+    "sha256": "bcd313e7cbef626dbfcab347bc1bbd652a68e4ada7ffbb3384ce822695628941",
+    "expandedBytes": 3723550
+  },
+  "rebuildBindings": [
+    "erlang",
+    "elixir"
+  ],
+  "tools": [
+    "node",
+    "make",
+    "elixir",
+    "erlc",
+    "cc"
+  ]
+}
