@@ -93,19 +93,8 @@ defmodule Bot do
       climb = if zone.shape == "sphere", do: C.angles_elevation_to(pos, zone.center), else: 0
       C.drive_set(r, %{throttle: 0.8, turn: clamp(C.angles_angle_diff(C.angles_bearing_to(pos, zone.center), heading) / 30), pitch_turn: clamp((climb - pitch) / 30)})
     end
-    # The arena's rate calibration, xorshift-sqrt v1; safe to delete.
-    work = C.raw_number(r, "state.calibration.work")
-    if is_number(work) and work > 0, do: C.status_set(r, %{text: "WORK", value: calibration_work(trunc(work), C.clock_tick(r))})
     free
   end
-  defp calibration_work(work, tick) do
-    import Bitwise
-    mask = 0xFFFFFFFFFFFFFFFF
-    {x, sum} = Enum.reduce(1..work, {bxor(88172645463325252, tick), 0.0}, fn _, {x, sum} ->
-      x = bxor(x, band(x <<< 13, mask)); x = bxor(x, x >>> 7); x = bxor(x, band(x <<< 17, mask))
-      {x, sum + :math.sqrt(x >>> 11)}
-    end)
-    rem(floor(sum) + (x >>> 40), 1000000)
-  end
+
 end
 Clunkyard.run(Bot)
