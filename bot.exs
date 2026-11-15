@@ -7,7 +7,8 @@
 # clock: tick seconds remaining_ticks
 # arena: size gravity terrain_kind ground_height(x y)
 # me: health position velocity heading pitch roll angular_velocity
-#   attitude grounded altitude applied
+#   attitude grounded altitude applied hull_mounts to_mount(heading pitch)
+#   from_mount(heading pitch) mount_toward(point)
 # battery: charge capacity regen sustainable_drive compute
 #   drive_cost(fraction)
 # drive: hover_lift
@@ -29,7 +30,8 @@
 # score: me best armour
 # angles: normalize(degrees) angle_diff(target current)
 #   bearing_to(from to) elevation_to(from to) direction(heading pitch)
-#   distance(a b) clamp(value low high)
+#   distance(a b) to_chassis(heading pitch attitude)
+#   from_chassis(heading pitch attitude) clamp(value low high)
 # raw: number(path) text(path) has(path) flag(path) count(path) line()
 # Controls: drive.set(throttle turn pitch_turn)
 #   drive.forces(thrust strafe lift yaw_torque pitch_torque roll_torque brake)
@@ -43,10 +45,14 @@
 # Manual: https://clunkyard.com/manual#sdk
 defmodule Bot do
   alias Clunkyard, as: C
-  def on_start(robot), do: C.match_is_3d(robot) and C.arena_gravity(robot).z == 0
+  def on_start(robot) do
+    free = C.match_is_3d(robot) and C.arena_gravity(robot).z == 0
+    %{free: free, dodges: 0, dodge_end: 0}
+  end
   defp clamp(value), do: C.angles_clamp(value, -1, 1)
   defp steer(towards, current), do: clamp(C.angles_angle_diff(towards, current) / 45)
-  def on_turn(r, free) do
+  def on_turn(r, m) do
+    free = m.free
     pos = C.me_position(r)
     heading = C.me_heading(r)
     pitch = C.me_pitch(r)
@@ -58,6 +64,7 @@ defmodule Bot do
         throttle = cond do target.range > 350 -> 0.7; target.range < 200 -> -0.4; true -> 0.2 end
         C.drive_set(r, %{throttle: throttle, turn: steer(target.bearing, heading), pitch_turn: steer(target.elevation, pitch)})
         C.scanner_set(r, %{heading: target.bearing, arc: 20, pitch: target.elevation})
+        # gun_lead is the intercept if the target holds course.
         power = C.gun_power_for_flight_time(r, target.range, 1)
         aim = C.gun_lead(r, target, power)
         {h, p} = if aim == :undefined, do: {target.bearing, target.elevation}, else: {aim.heading, aim.pitch}
@@ -82,6 +89,23 @@ defmodule Bot do
         C.scanner_set(r, %{heading: C.angles_normalize(C.scanner_last(r).heading + 36), arc: 40, pitch: up})
         C.status_set(r, %{text: "SEARCH"})
     end
+    # A simple dodge: vary it, or predict the shooter.
+    tick = C.clock_tick(r)
+    m =
+      if tick >= m.dodge_end and Enum.any?(C.sensors_cues(r), &(&1.source == "muzzle")),
+        do: %{m | dodges: m.dodges + 1, dodge_end: tick + 10},
+        else: m
+    if tick < m.dodge_end do
+      # Off the line of fire: left, then right next time (turn is positive left, strafe right).
+      left = rem(m.dodges, 2) == 1
+      if C.match_control(r) == "forces" do
+        C.drive_set(r, %{throttle: 0.5})
+        C.drive_forces(r, %{strafe: if(left, do: -1, else: 1)})
+      else
+        C.drive_set(r, %{throttle: 1, turn: if(left, do: 1, else: -1)})
+      end
+      C.status_set(r, %{text: if(left, do: "dodge:left", else: "dodge:right"), value: m.dodges})
+    end
     if C.battery_charge(r) < C.battery_capacity(r) / 4, do: C.drive_set(r, %{throttle: C.drive_get(r, :throttle) * 0.5})
     storm = C.nav_storm(r)
     if storm != :undefined and C.nav_storm_margin(r, pos) > -60 do
@@ -93,7 +117,7 @@ defmodule Bot do
       climb = if zone.shape == "sphere", do: C.angles_elevation_to(pos, zone.center), else: 0
       C.drive_set(r, %{throttle: 0.8, turn: clamp(C.angles_angle_diff(C.angles_bearing_to(pos, zone.center), heading) / 30), pitch_turn: clamp((climb - pitch) / 30)})
     end
-    free
+    m
   end
 
 end
